@@ -20,7 +20,6 @@ import com.inventario.sistema_inventario.services.CategoriaRepository;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 
 
 
@@ -89,8 +88,18 @@ public class CategoriasController {
         repo.save(categoriaExistente);
 
         return "redirect:/categorias";
-}
+    }
 
+    @PostMapping("/delete")
+    public String eliminarSuavemente(@RequestParam Long id) {
+        Categoria categoria = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada"));
+        
+        // Marcar la categoría como no disponible
+        categoria.setDisponibility(false);
+        repo.save(categoria);
+    
+        return "redirect:/categorias";
+    }
     
     
 }
