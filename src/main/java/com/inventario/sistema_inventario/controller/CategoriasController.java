@@ -1,36 +1,96 @@
 package com.inventario.sistema_inventario.controller;
 
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.inventario.sistema_inventario.models.Categoria;
-import com.inventario.sistema_inventario.models.Producto;
+import com.inventario.sistema_inventario.services.CategoriaRepository;
+
+import jakarta.validation.Valid;
+
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+
 
 
 @Controller
+@RequestMapping("/categorias")
 public class CategoriasController {
+
+    @Autowired
+    private CategoriaRepository repo;
     
+
+    //Mostrar Categorias
     /* https://localhost:8080/categorias */
-    @GetMapping("/categorias")
+    @GetMapping("")
     public String categoriasMenu(Model model) {
         //Titulo de la página
         model.addAttribute("title", "Categorias");
         model.addAttribute("agregarModal", "Agregar Nueva Categoria");
+        model.addAttribute("editarModal", "Editar Categoria");
         
-        
-        //Crud Categorias
-        Categoria categoria = new Categoria(1, "Escritura", "Categoria relacionada a la escritura", "19-10-2003", true);
-        model.addAttribute("categorias", categoria);
-        
+        //Lista de categorias
+        List<Categoria> categorias = repo.findAll();
+        model.addAttribute("categorias", categorias);
+
+        model.addAttribute("categoriaAdd", new Categoria());
+
         return "categoriasMenu";
     }
+                            
+    @PostMapping("/add")
+    public String agregar(@Valid @ModelAttribute("categoriaAdd") Categoria categoria, BindingResult result) {
+        
+        if (result.hasErrors()) {
+            return "redirect:/categorias";
+        }
+        
+        // Guardar la nueva categoria en la base de datos
+        repo.save(categoria);
 
-    @GetMapping("/productos")
-    public String productosMenu(Model model) {
-        Producto producto = new Producto(1, "KK123123", "Lapíz de escritura");
-        model.addAttribute("productos", producto);
-        return "productosMenu";
+        // Redirigir al menu de categorias
+        return "redirect:/categorias";
     }
+
+    @GetMapping("/{id}")
+    @ResponseBody
+    public Categoria obtenerCategoriaPorId(@PathVariable Long id) {
+        return repo.findById(id)
+        .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada: " + id));
+    }
+    
+    
+    @PostMapping("/edit")
+    public String editarCategoria(@RequestParam Long id, @Valid @ModelAttribute("categoria") Categoria categoria, BindingResult result) {
+        if (result.hasErrors()) {
+            return "redirect:/categorias";  // Si hay errores de validación, redirige
+        }
+
+        Categoria categoriaExistente = repo.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada: " + id));
+
+        // Actualiza los valores de la categoría existente
+        categoriaExistente.setName(categoria.getName());
+        categoriaExistente.setDescription(categoria.getDescription());
+
+        // Guarda los cambios
+        repo.save(categoriaExistente);
+
+        return "redirect:/categorias";
+}
+
     
     
 }

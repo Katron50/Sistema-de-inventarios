@@ -33,13 +33,10 @@
                 </ul>
             </div>
         </div>
-    </nav>
+    </nav>    
     
-    <!-- Button trigger modal -->
-    
-    
-    <!-- Modal -->
-    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <!-- Modal Agregar-->
+    <div class="modal fade" id="agregarModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -47,60 +44,92 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form  method="POST">
+                <!--  Formulario para agregar categoria-->
+                <form th:action="@{/categorias/add}" method="POST" th:object="${categoriaAdd}">
                     <div class="mb-3">
                       <label for="name" class="form-label">Nombre</label>
-                      <input type="text" class="form-control" id="name" aria-describedby="emailHelp" placeholder="Escribe el nombre de la categoria" maxlength="50">
+                      <input type="text" class="form-control"  id="name" th:field="*{name}" placeholder="Escribe el nombre de la categoria" maxlength="50">
                     </div>
                     <div class="mb-3">
                         <label for="description" class="form-label">Descripción</label>
-                        <textarea class="form-control" id="description" rows="3" maxlength="250"></textarea>
+                        <textarea class="form-control"  id="description" th:field="*{description}" rows="3" maxlength="250"></textarea>
                     </div>
+                    
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Agregar</button>
                   </form>
             </div>
-            <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-            <button type="button" class="btn btn-primary">Agregar</button>
-            </div>
         </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar -->
+    <div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarModalLabel">Editar Categoría</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm" method="POST" th:object="${categoriaAdd}" action="/categorias/edit">
+                        <input type="hidden" name="_method" value="PUT" />
+                        <input type="hidden" id="categoriaId" name="id" />
+                        <div class="mb-3">
+                            <label for="nameEdit" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" th:field="*{name}" id="nameEdit" name="nameEdit" placeholder="Escribe el nombre de la categoría" maxlength="50">
+                        </div>
+                        <div class="mb-3">
+                            <label for="descriptionEdit" class="form-label">Descripción</label>
+                            <textarea class="form-control" th:field="*{description}" id="descriptionEdit" name="descriptionEdit" rows="3" maxlength="250"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Actualizar</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- tabla -->
     <div class="container">
-        <!-- Botón del modal -->
-        <button type="button" th:text="${agregarModal}" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop"></button>
+        <!-- Botón del modal agregar -->
+        <button type="button" th:text="${agregarModal}" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#agregarModal"></button>
 
+        <!-- tabla de categorias -->
         <div class="table-responsive">
             <table class="table">
                 <thead>
-                    <tr >
+                    <tr>
+                        <th scope="col">#</th>
                         <th scope="col">Nombre</th>
                         <th scope="col">Descripción</th>
                         <th scope="col">Acciones</th>
                     </tr>
                 </thead>
-                <!-- <tbody class="table-group-divider">
-                    <tr th:echo="categoria : ${categorias}">
-                        <th scope="row">1</th>
-                        <td th:text="${categoria.nombre}"></td>
-                        <td th:text="${categoria.descripcion}">Otto</td>
-                        <td> 
-                            <button>
-                                Editar
-                            </button>
-                            <button>
-                                Eliminar
-                            </button>
-                        </td>
+                <tbody class="table-group-divider">
+                    <tr th:each="categoria, categoriaStat : ${categorias}">
+                        <div th:if="${categoria.disponibility} == true">
+                            <th scope="row" th:text="${categoriaStat.index + 1}"></th>
+                            <td th:text="${categoria.name}"></td>
+                            <td th:text="${categoria.description}"></td>
+                            <td> 
+                                <button type="button" onclick="editarCategoria(this)" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editarModal" th:data-id="${categoria.id}">
+                                    Editar
+                                </button>
+                                <button type="button" class="btn btn-danger">
+                                    Eliminar
+                                </button>
+                            </td>
+                        </div>
                     </tr>
-                </tbody> -->
+                </tbody>
             </table>
-            
         </div>
     </div>
         
-        <!-- Bootstrap  -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Bootstrap  -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script th:src="@{js/script.js}"></script>
     </body>
-    </html>
+    </html> 
