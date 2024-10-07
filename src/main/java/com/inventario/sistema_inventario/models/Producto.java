@@ -1,16 +1,74 @@
 package com.inventario.sistema_inventario.models;
 
+import java.time.LocalDateTime;
+
+
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@ToString
+@Entity
+@Table(name = "productos")
 public class Producto {
     
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String key;
+
+    @Column(name = "clave", nullable = false, length = 15, unique = true)
+    @Pattern(regexp = "^[^\\s]{15}$", message = "La clave debe tener exactamente 15 caracteres y no contener espacios.")
+    private String productKey;
+
+    @Column(name = "nombre", nullable = false, length = 50, unique = true)
+    @NotBlank(message = "El nombre del producto no puede estar vacío.")
+    @Size(max = 50, message = "El nombre del producto no puede tener más de 50 caracteres.")
     private String name;
+
+    @Column(name = "descripcion", nullable = true, length = 250)
+    @Size(max = 250, message = "La descripción no puede tener más de 250 caracteres.")
+    private String description;
+
+    @Column(name = "id_categoria", nullable = false)
+    @NotNull(message = "La categoría debe ser seleccionada.")
+    @PositiveOrZero(message = "El id debe ser un número positivo.")
+    private Long id_category;
+
+    @Column(name = "tolerancia", nullable = false)
+    @PositiveOrZero(message = "La tolerancia debe ser un número positivo.")
+    private int tolerance;
+
+    @Column(name = "imagen", nullable = true)
+    @Pattern(regexp = ".*\\.(jpeg|jpg|png)$", message = "La imagen debe tener formato .jpeg, .jpg o .png.")
+    private String image;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime date;
+
+    @Column(name = "disponibilidad", nullable = false)
+    private boolean disponibility;
+
+
+    public Producto(){
+        this.disponibility = true;
+        this.date = LocalDateTime.now();
+    }
     
 }

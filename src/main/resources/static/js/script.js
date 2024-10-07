@@ -1,3 +1,5 @@
+
+
 function editarCategoria(button) {
     // Obtener el ID desde el atributo data-id del botón
     let id = button.getAttribute('data-id');

@@ -37,7 +37,7 @@ public class CategoriasController {
     public String categoriasMenu(Model model) {
         //Titulo de la página
         model.addAttribute("title", "Categorias");
-        model.addAttribute("agregarModal", "Agregar Nueva Categoria");
+        model.addAttribute("agregarModal", "Añadir Categoria");
         model.addAttribute("editarModal", "Editar Categoria");
         
         //Lista de categorias
@@ -51,9 +51,13 @@ public class CategoriasController {
                             
     @PostMapping("/add")
     public String agregar(@Valid @ModelAttribute("categoriaAdd") Categoria categoria, BindingResult result) {
-        
+        //Ver si ya existe la categoria
+        if (repo.existsByName(categoria.getName())) {
+            result.rejectValue("name", "error.categoriaAdd", "La categoría ya existe.");
+        }
+
         if (result.hasErrors()) {
-            return "redirect:/categorias";
+            return "";
         }
         
         // Guardar la nueva categoria en la base de datos
@@ -76,7 +80,6 @@ public class CategoriasController {
         if (result.hasErrors()) {
             return "redirect:/categorias";  // Si hay errores de validación, redirige
         }
-
         Categoria categoriaExistente = repo.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada: " + id));
 

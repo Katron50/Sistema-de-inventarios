@@ -6,4 +6,5 @@ import com.inventario.sistema_inventario.models.Categoria;
 
 public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
     
+    boolean existsByName(String name); // Para verificar si existe una categoria con ese nombre
 }
