@@ -2,7 +2,7 @@ package com.inventario.sistema_inventario.models;
 
 import java.time.LocalDateTime;
 
-
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -58,6 +59,9 @@ public class Producto {
     @Column(name = "imagen", nullable = true)
     @Pattern(regexp = ".*\\.(jpeg|jpg|png)$", message = "La imagen debe tener formato .jpeg, .jpg o .png.")
     private String image;
+
+    @Transient
+    private MultipartFile imageFile; // Para manejar el archivo de imagen
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime date;

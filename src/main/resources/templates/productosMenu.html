@@ -42,38 +42,44 @@
             <div class="modal-body">
                 
                 <!--  Formulario para agregar categoria-->
-                <form action="" method="POST" th:object="${productoAdd}" enctype="multipart/form-data">
+                <form th:action="@{/productos/add}" method="POST" th:object="${productoAdd}" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="key" class="form-label">Clave</label>
                         <input type="text" class="form-control"  id="key" th:field="*{productKey}" placeholder="Máximo 15 caracteres" maxlength="15" required>
+                            <p th:if="${#fields.hasErrors('productKey')}" th:errors="*{productKey}" th:errorclass="text-danger"></p>
                     </div>
 
                     <div class="mb-3">
                         <label for="name" class="form-label">Nombre</label>
                         <input type="text" class="form-control"  id="name" th:field="*{name}" placeholder="Escribe el nombre del producto" maxlength="50" required>
+                        <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" th:errorclass="text-danger"></p>
                     </div>
 
                     <div class="mb-3">
                         <label for="description" class="form-label">Descripción</label>
                         <textarea class="form-control"  id="description" th:field="*{description}" rows="3" maxlength="250"></textarea>
+                        <p th:if="${#fields.hasErrors('description')}" th:errors="*{description}" th:errorclass="text-danger"></p>
                     </div>
 
                     <div class="mb-3">
                         <label for="id_category" class="form-label">Categoria</label>
                         <select name="id_category" id="id_category" class="form-select" th:field="*{id_category}" required>
                             <option value="" disabled selected>Seleccione una categoría</option>
-                            <option th:each="categoria : ${categorias}" th:text="${categoria.name}" value="${categoria.id}" ></option>
+                            <option th:each="categoria : ${categorias}" th:text="${categoria.name}" th:value="${categoria.id}" ></option>
                         </select>
+                        <p th:if="${#fields.hasErrors('id_category')}" th:errors="*{id_category}" th:errorclass="text-danger"></p>
                     </div>
 
                     <div class="mb-3">
                         <label for="image" class="form-label">Imagen</label>
-                        <input class="form-control" type="file" id="image" th:field="*{image}">
+                        <input class="form-control" type="file" id="image" th:field="*{imageFile}">
+                        <p th:if="${#fields.hasErrors('image')}" th:errors="*{image}" th:errorclass="text-danger"></p>
                     </div>
 
                     <div class="mb-3">
                         <label for="tolerance" class="form-label">Tolerancia</label>
                         <input type="number" class="form-control" name="tolerance" id="tolerance" min="0" placeholder="Sirve para avisar si se esta por acabar las existencias" th:field="*{tolerance}">
+                        <p th:if="${#fields.hasErrors('tolerance')}" th:errors="*{tolerance}" th:errorclass="text-danger"></p>
                     </div>
                     
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -121,10 +127,10 @@
                             
                             <!-- Acciones -->
                             <td> 
-                                <button type="button" onclick="editarCategoria(this)" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editarModal" th:data-id="${producto.id}">
+                                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editarModal" th:data-id="${producto.id}">
                                     Editar
                                 </button>
-                                <button type="button" onclick="borrarCategoria(this)" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#borrarModal" th:data-id="${producto.id}">
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#borrarModal" th:data-id="${producto.id}">
                                     Eliminar
                                 </button>
                             </td>

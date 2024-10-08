@@ -50,7 +50,7 @@ public class CategoriasController {
     }
                             
     @PostMapping("/add")
-    public String agregar(@Valid @ModelAttribute("categoriaAdd") Categoria categoria, BindingResult result) {
+    public String agregarCategoria(@Valid @ModelAttribute("categoriaAdd") Categoria categoria, BindingResult result) {
         //Ver si ya existe la categoria
         if (repo.existsByName(categoria.getName())) {
             result.rejectValue("name", "error.categoriaAdd", "La categoría ya existe.");
