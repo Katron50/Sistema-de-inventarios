@@ -69,14 +69,10 @@ public class ProductosController {
 
     @PostMapping("/add")
     public String agregarProducto(@Valid @ModelAttribute("productoAdd") Producto producto, BindingResult result) {
-
-        if (result.hasErrors()) {
-            return "productosMenu";
-        }
         
         MultipartFile image = producto.getImageFile();
         String imageName = producto.getName().trim() + ".jpg";
-
+        
         if (image != null && !image.isEmpty()) {
             try {
                 String dirImages = "public/images/";
@@ -85,25 +81,44 @@ public class ProductosController {
                 if(!Files.exists(dirImPath)){
                     Files.createDirectories(dirImPath);
                 }
-
+                
                 try (InputStream inputStream = image.getInputStream()){
                     Files.copy(inputStream, Paths.get(dirImages + imageName), StandardCopyOption.REPLACE_EXISTING);
                     producto.setImage(imageName);
                 }
-               
+                
             } catch (IOException e) {
                 System.out.println("Error al guardar la imagen: " + e.getMessage());
             }
         }
 
-        if (producto.getTolerance() < 0 ){
+        Integer tolerance = producto.getTolerance(); // Obtener el valor directamente
+
+        // Validar tolerancia
+        if (tolerance == null || tolerance < 0) {
             producto.setTolerance(0);
         }
 
+        // Verificar si el campo tolerancia está vacío o no es un número
+        try {
+            if (String.valueOf(tolerance).isBlank()) {
+                producto.setTolerance(0);
+            }
+        } catch (NumberFormatException e) {
+            producto.setTolerance(0);
+            result.rejectValue("tolerance", "invalid.tolerance", "La tolerancia debe ser un número válido.");
+        }
 
+        
+        
+        if (result.hasErrors()) {
+            System.out.println(result);
+            return "productosMenu";
+        }
+        
         // Guardar la nueva categoria en la base de datos
         repo.save(producto);
-
+        
         // Redirigir al menu de categorias
         return "redirect:/productos";
     }

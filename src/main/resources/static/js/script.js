@@ -1,4 +1,25 @@
 
+function agregar(button, event, entidad){
+
+    validaciones(event, entidad);
+}
+
+function validaciones(event, entidad){
+
+    if (entidad == 'productos'){
+        let toleranceInput = document.getElementById('tolerance');
+        if (toleranceInput.value.trim() === '') {
+            toleranceInput.value = 0; // Establece 0 si el campo está vacío
+        }else if (isNaN(toleranceInput.value)) {
+            // Maneja el caso en que el valor no es un número
+            alert('Por favor, ingresa un número válido para la tolerancia.');
+            event.preventDefault(); // Previene el envío del formulario
+        }
+    }
+    
+}
+
+
 // Funcion para editar categorias y productos
 function editar(button, entidad) {
     // Obtener el ID desde el atributo data-id del botón

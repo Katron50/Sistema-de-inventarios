@@ -53,7 +53,7 @@ public class Producto {
 
     @Column(name = "tolerancia", nullable = false)
     @PositiveOrZero(message = "La tolerancia debe ser un número positivo.")
-    private int tolerance;
+    private Integer tolerance;
 
     @Column(name = "imagen", nullable = true)
     @Pattern(regexp = ".*\\.(jpeg|jpg|png)$", message = "La imagen debe tener formato .jpeg, .jpg o .png.")
