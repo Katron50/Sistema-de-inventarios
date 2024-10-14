@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.inventario.sistema_inventario.models.Categoria;
-import com.inventario.sistema_inventario.models.Producto;
 import com.inventario.sistema_inventario.services.CategoriaRepository;
 import com.inventario.sistema_inventario.services.ProductoRepository;
 
