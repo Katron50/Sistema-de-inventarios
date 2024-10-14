@@ -3,16 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalles del Producto</title>
+    <!-- bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <link rel="stylesheet" th:href="@{css/style.css}">
+    <title>Productos</title>
 </head>
 <body>
-    <h1>Productos</h1>
+    <header class="hd">
+        <div th:replace="~{fragments/fragments.html :: header}"></div>
+    </header>
 
-    <h2>Detalles del producto</h2>
-    <div th:object="${productos}">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-        <p>Clave: <strong th:text="*{key}"></strong></p>
-        <p>Nombre: <strong th:text="*{name}"></strong></p>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/productos}">Productos</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/categorias}">Categorias</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/compras}">Compras</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/solicitud}">Solicitud</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Modal Agregar-->
+    <div class="modal fade" id="agregarModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel" th:text="${agregarModal}"></h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    
+                    <!--  Formulario para agregar categoria-->
+                    <form th:action="@{/productos/add}" method="POST" th:object="${productoAdd}" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="key" class="form-label">Clave</label>
+                            <input type="text" class="form-control"  id="key" th:field="*{productKey}" placeholder="Máximo 15 caracteres" maxlength="15" required>
+                                <p th:if="${#fields.hasErrors('productKey')}" th:errors="*{productKey}" th:errorclass="text-danger"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nombre</label>
+                            <input type="text" class="form-control"  id="name" th:field="*{name}" placeholder="Escribe el nombre del producto" maxlength="50" required>
+                            <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" th:errorclass="text-danger"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Descripción</label>
+                            <textarea class="form-control"  id="description" th:field="*{description}" rows="3" maxlength="250"></textarea>
+                            <p th:if="${#fields.hasErrors('description')}" th:errors="*{description}" th:errorclass="text-danger"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_category" class="form-label">Categoria</label>
+                            <select name="id_category" id="id_category" class="form-select" th:field="*{categoria}" required>
+                                <option value="" disabled selected>Seleccione una categoría</option>
+                                <option th:each="categoria : ${categorias}" th:text="${categoria.name}" th:value="${categoria.id}" ></option>
+                            </select>
+                            <!-- <p th:if="${#fields.hasErrors('id_category')}" th:errors="*{id_category}" th:errorclass="text-danger"></p> -->
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Imagen</label>
+                            <input class="form-control" type="file" id="image" th:field="*{imageFile}">
+                            <p th:if="${#fields.hasErrors('image')}" th:errors="*{image}" th:errorclass="text-danger"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="tolerance" class="form-label">Tolerancia</label>
+                            <input type="number" class="form-control" name="tolerance" id="tolerance" min="0" placeholder="Sirve para avisar si se esta por acabar las existencias" th:field="*{tolerance}">
+                            <p th:if="${#fields.hasErrors('tolerance')}" th:errors="*{tolerance}" th:errorclass="text-danger"></p>
+                        </div>
+                        
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Agregar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Modal Editar-->
+    <div class="modal fade" id="editarModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel" th:text="${editarModal}"></h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                
+                <!--  Formulario para agregar categoria-->
+                <form th:action="@{/productos/edit}" method="POST" th:object="${productoAdd}" id="editForm" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="key" class="form-label">Clave</label>
+                        <input type="text" id="productKeyEdit" class="form-control" placeholder="Máximo 15 caracteres" maxlength="15" disabled required>
+                            <p th:if="${#fields.hasErrors('productKey')}" th:errors="*{productKey}" th:errorclass="text-danger"></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nombre</label>
+                        <input type="text" class="form-control"  id="nameEdit" th:field="*{name}" placeholder="Escribe el nombre del producto" maxlength="50" required>
+                        <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" th:errorclass="text-danger"></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Descripción</label>
+                        <textarea class="form-control"  id="descriptionEdit" th:field="*{description}" rows="3" maxlength="250"></textarea>
+                        <p th:if="${#fields.hasErrors('description')}" th:errors="*{description}" th:errorclass="text-danger"></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_category" class="form-label">Categoria</label>
+                        <select name="id_category" id="id_category_edit" class="form-select" th:field="*{categoria}" required>
+                            <option value="" disabled selected>Seleccione una categoría</option>
+                            <option th:each="categoria : ${categorias}" th:text="${categoria.name}" th:value="${categoria.id}" ></option>
+                        </select>
+                        <!-- <p th:if="${#fields.hasErrors('id_category')}" th:errors="*{id_category}" th:errorclass="text-danger"></p> -->
+                    </div>
+
+                    <div class="mb-3">
+                        
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Imagen</label>
+                        <input class="form-control" type="file"  id="imageEdit" th:field="*{imageFile}">
+
+                        <div id="imageContainer" style="display: none;">
+                            <img src="" id="imageEditShow" width="150px" height="150px">
+                            <button onclick="borrarImg(this, event)" id="btnBorrarImg" th:data-id="${productoAdd.id}" class="btn btn-danger">Borrar Imagen</button>    
+                        </div>
+
+                        <p id="imgDeleteText" style="color: green;"></p>
+                        <p th:if="${#fields.hasErrors('image')}" th:errors="*{image}" th:errorclass="text-danger"></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="tolerance" class="form-label">Tolerancia</label>
+                        <input type="number" class="form-control" name="tolerance" id="toleranceEdit" min="0" placeholder="Sirve para avisar si se esta por acabar las existencias" th:field="*{tolerance}">
+                        <p th:if="${#fields.hasErrors('tolerance')}" th:errors="*{tolerance}" th:errorclass="text-danger"></p>
+                        
+                    </div>
+                    
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Actualizar</button>
+                  </form>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <!-- Borrar Categoria -->
+    <div class="modal fade" id="borrarModal"  data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"  aria-hidden="true" aria-labelledby="borrarModalLabel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="borrarModalLabel">Eliminar Producto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    
+                    <form id="deleteForm" method="POST" th:object="${productoAdd}" action="/productos /delete">
+
+                        <div class="mb-3">
+                            <p id="nameDelete"></p>
+                        </div>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Botón del modal agregar -->
+        <button type="button" th:text="${agregarModal}" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#agregarModal"></button>
+
+        <!-- tabla de categorias -->
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Nombre de la categoria</th>
+                        <th scope="col">Imagen</th>
+                        <th scope="col">Precio del inventario restante</th>
+                        <th scope="col">Cantidad actual</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    <tr th:each="producto, productoStat : ${productos}">
+                        <div th:if="${producto.disponibility} == true">
+                            <th scope="row" th:text="${productoStat.count}"></th>
+                            <td th:text="${producto.name}"></td>
+                            <td th:text="${producto.description}"></td>
+                            <td th:text="${producto.categoria.name}"></td>
+
+                            <td>
+                                <img th:src="@{'/images/' + ${producto.image}}" width="100">
+                            </td>
+
+                            <td>Precio</td>
+                            <td>Cantidad</td>
+                            
+                            <!-- Acciones -->
+                            <td> 
+                                <button type="button" onclick="editar(this, 'productos')" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editarModal" th:data-id="${producto.id}">
+                                    Editar
+                                </button>
+                                <button type="button" onclick="borrar(this, 'productos')" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#borrarModal" th:data-id="${producto.id}">
+                                    Eliminar
+                                </button>
+                            </td>
+                        </div>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script th:src="@{js/script.js}"></script>
 </body>
 </html>

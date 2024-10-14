@@ -1,7 +1,9 @@
 package com.inventario.sistema_inventario.controller;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,11 +18,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.inventario.sistema_inventario.models.Categoria;
 import com.inventario.sistema_inventario.services.CategoriaRepository;
+import com.inventario.sistema_inventario.services.ProductoRepository;
 
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 
 
 
@@ -30,6 +32,9 @@ public class CategoriasController {
 
     @Autowired
     private CategoriaRepository repo;
+
+    @Autowired
+    private ProductoRepository repoProducts;
     
 
     //Mostrar Categorias
@@ -38,12 +43,20 @@ public class CategoriasController {
     public String categoriasMenu(Model model) {
         //Titulo de la página
         model.addAttribute("title", "Categorias");
-        model.addAttribute("agregarModal", "Agregar Nueva Categoria");
+        model.addAttribute("agregarModal", "Añadir Categoria");
         model.addAttribute("editarModal", "Editar Categoria");
         
         //Lista de categorias
         List<Categoria> categorias = repo.findAll();
         model.addAttribute("categorias", categorias);
+
+        // Contar productos por cada categoría y almacenarlo en el modelo
+        Map<Long, Integer> productosPorCategoria = new HashMap<>();
+        for (Categoria categoria : categorias) {
+            int count = repoProducts.countByDisponibilityAndCategoriaId(true, categoria.getId());
+            productosPorCategoria.put(categoria.getId(), count);
+        }
+        model.addAttribute("productosPorCategoria", productosPorCategoria);
 
         model.addAttribute("categoriaAdd", new Categoria());
 
@@ -51,10 +64,14 @@ public class CategoriasController {
     }
                             
     @PostMapping("/add")
-    public String agregar(@Valid @ModelAttribute("categoriaAdd") Categoria categoria, BindingResult result) {
-        
+    public String agregarCategoria(@Valid @ModelAttribute("categoriaAdd") Categoria categoria, BindingResult result) {
+        //Ver si ya existe la categoria
+        if (repo.existsByName(categoria.getName())) {
+            result.rejectValue("name", "error.categoriaAdd", "La categoría ya existe.");
+        }
+
         if (result.hasErrors()) {
-            return "redirect:/categorias";
+            return "";
         }
         
         // Guardar la nueva categoria en la base de datos
@@ -77,7 +94,6 @@ public class CategoriasController {
         if (result.hasErrors()) {
             return "redirect:/categorias";  // Si hay errores de validación, redirige
         }
-
         Categoria categoriaExistente = repo.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada: " + id));
 
@@ -89,8 +105,18 @@ public class CategoriasController {
         repo.save(categoriaExistente);
 
         return "redirect:/categorias";
-}
+    }
 
+    @PostMapping("/delete")
+    public String eliminarSuavemente(@RequestParam Long id) {
+        Categoria categoria = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada"));
+        
+        // Marcar la categoría como no disponible
+        categoria.setDisponibility(false);
+        repo.save(categoria);
+    
+        return "redirect:/categorias";
+    }
     
     
 }

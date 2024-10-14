@@ -10,16 +10,12 @@
     <title>Categorias</title>
 </head>
 <body>
-
+    <!-- Cabecera -->
     <header class="hd"> 
-        
-
         <div th:replace="~{fragments/fragments.html :: header}"></div>
-        
     </header>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-            <!-- <a class="navbar-brand" href="#">sas</a> -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -44,12 +40,18 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                
                 <!--  Formulario para agregar categoria-->
                 <form th:action="@{/categorias/add}" method="POST" th:object="${categoriaAdd}">
                     <div class="mb-3">
-                      <label for="name" class="form-label">Nombre</label>
-                      <input type="text" class="form-control"  id="name" th:field="*{name}" placeholder="Escribe el nombre de la categoria" maxlength="50">
+                        <label for="name" class="form-label">Nombre</label>
+                        <input type="text" class="form-control"  id="name" th:field="*{name}" placeholder="Escribe el nombre de la categoria" maxlength="50" required>
                     </div>
+
+                    <!-- <div th:if="${#fields.hasErrors('name')}" style="color: red;">
+                        <p th:each="err : ${#fields.errors('name')}" th:text="${err}"></p>
+                    </div> -->
+                    
                     <div class="mb-3">
                         <label for="description" class="form-label">Descripción</label>
                         <textarea class="form-control"  id="description" th:field="*{description}" rows="3" maxlength="250"></textarea>
@@ -64,17 +66,16 @@
     </div>
 
     <!-- Modal Editar -->
-    <div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editarModal"  data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"  aria-hidden="true" aria-labelledby="editarModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editarModalLabel">Editar Categoría</h5>
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel" th:text="${editarModal}"></h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="editForm" method="POST" th:object="${categoriaAdd}" action="/categorias/edit">
-                        <input type="hidden" name="_method" value="PUT" />
-                        <input type="hidden" id="categoriaId" name="id" />
+
                         <div class="mb-3">
                             <label for="nameEdit" class="form-label">Nombre</label>
                             <input type="text" class="form-control" th:field="*{name}" id="nameEdit" name="nameEdit" placeholder="Escribe el nombre de la categoría" maxlength="50">
@@ -83,13 +84,36 @@
                             <label for="descriptionEdit" class="form-label">Descripción</label>
                             <textarea class="form-control" th:field="*{description}" id="descriptionEdit" name="descriptionEdit" rows="3" maxlength="250"></textarea>
                         </div>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                         <button type="submit" class="btn btn-primary">Actualizar</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+    <!-- Borrar Categoria -->
+    <div class="modal fade" id="borrarModal"  data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"  aria-hidden="true" aria-labelledby="borrarModalLabel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="borrarModalLabel">Eliminar Categoría</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- th:object="${categoriaAdd}" *{name} th:text=""-->
+                    <form id="deleteForm" method="POST" th:object="${categoriaAdd}" action="/categorias/delete">
 
+                        <div class="mb-3">
+                            <p id="nameDelete"></p>
+                        </div>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- tabla -->
     <div class="container">
         <!-- Botón del modal agregar -->
@@ -103,20 +127,23 @@
                         <th scope="col">#</th>
                         <th scope="col">Nombre</th>
                         <th scope="col">Descripción</th>
+                        <th scope="col">Productos por categoria</th>
                         <th scope="col">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="table-group-divider">
                     <tr th:each="categoria, categoriaStat : ${categorias}">
                         <div th:if="${categoria.disponibility} == true">
-                            <th scope="row" th:text="${categoriaStat.index + 1}"></th>
+                            <th scope="row" th:text="${categoriaStat.count}"></th>
                             <td th:text="${categoria.name}"></td>
                             <td th:text="${categoria.description}"></td>
+                            <td th:text="${productosPorCategoria[categoria.id]}"></td>
+                            <!-- Acciones -->
                             <td> 
-                                <button type="button" onclick="editarCategoria(this)" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editarModal" th:data-id="${categoria.id}">
+                                <button type="button" onclick="editar(this, 'categorias')" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editarModal" th:data-id="${categoria.id}">
                                     Editar
                                 </button>
-                                <button type="button" class="btn btn-danger">
+                                <button type="button" onclick="borrar(this, 'categorias')" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#borrarModal" th:data-id="${categoria.id}">
                                     Eliminar
                                 </button>
                             </td>
