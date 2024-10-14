@@ -70,7 +70,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editarModalLabel">Editar Categoría</h5>
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel" th:text="${editarModal}"></h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -127,6 +127,7 @@
                         <th scope="col">#</th>
                         <th scope="col">Nombre</th>
                         <th scope="col">Descripción</th>
+                        <th scope="col">Productos por categoria</th>
                         <th scope="col">Acciones</th>
                     </tr>
                 </thead>
@@ -136,12 +137,13 @@
                             <th scope="row" th:text="${categoriaStat.count}"></th>
                             <td th:text="${categoria.name}"></td>
                             <td th:text="${categoria.description}"></td>
+                            <td th:text="${productosPorCategoria[categoria.id]}"></td>
                             <!-- Acciones -->
                             <td> 
-                                <button type="button" onclick="editarCategoria(this)" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editarModal" th:data-id="${categoria.id}">
+                                <button type="button" onclick="editar(this, 'categorias')" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editarModal" th:data-id="${categoria.id}">
                                     Editar
                                 </button>
-                                <button type="button" onclick="borrarCategoria(this)" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#borrarModal" th:data-id="${categoria.id}">
+                                <button type="button" onclick="borrar(this, 'categorias')" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#borrarModal" th:data-id="${categoria.id}">
                                     Eliminar
                                 </button>
                             </td>

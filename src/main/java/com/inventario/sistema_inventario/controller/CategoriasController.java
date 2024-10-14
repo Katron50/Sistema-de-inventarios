@@ -1,7 +1,9 @@
 package com.inventario.sistema_inventario.controller;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.inventario.sistema_inventario.models.Categoria;
+import com.inventario.sistema_inventario.models.Producto;
 import com.inventario.sistema_inventario.services.CategoriaRepository;
+import com.inventario.sistema_inventario.services.ProductoRepository;
 
 import jakarta.validation.Valid;
 
@@ -29,6 +33,9 @@ public class CategoriasController {
 
     @Autowired
     private CategoriaRepository repo;
+
+    @Autowired
+    private ProductoRepository repoProducts;
     
 
     //Mostrar Categorias
@@ -43,6 +50,14 @@ public class CategoriasController {
         //Lista de categorias
         List<Categoria> categorias = repo.findAll();
         model.addAttribute("categorias", categorias);
+
+        // Contar productos por cada categoría y almacenarlo en el modelo
+        Map<Long, Integer> productosPorCategoria = new HashMap<>();
+        for (Categoria categoria : categorias) {
+            int count = repoProducts.countByDisponibilityAndCategoriaId(true, categoria.getId());
+            productosPorCategoria.put(categoria.getId(), count);
+        }
+        model.addAttribute("productosPorCategoria", productosPorCategoria);
 
         model.addAttribute("categoriaAdd", new Categoria());
 

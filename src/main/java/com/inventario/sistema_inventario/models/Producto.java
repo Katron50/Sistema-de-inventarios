@@ -9,11 +9,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
@@ -47,10 +47,9 @@ public class Producto {
     @Size(max = 250, message = "La descripción no puede tener más de 250 caracteres.")
     private String description;
 
-    @Column(name = "id_categoria", nullable = false)
-    @NotNull(message = "La categoría debe ser seleccionada.")
-    @PositiveOrZero(message = "El id debe ser un número positivo.")
-    private Long id_category;
+    @ManyToOne
+    @JoinColumn(name = "id_category", nullable = false)
+    private Categoria categoria;
 
     @Column(name = "tolerancia", nullable = false)
     @PositiveOrZero(message = "La tolerancia debe ser un número positivo.")
