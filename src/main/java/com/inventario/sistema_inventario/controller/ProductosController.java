@@ -48,7 +48,7 @@ public class ProductosController {
         model.addAttribute("agregarModal", "Agregar nuevo producto");
         model.addAttribute("editarModal", "Editar producto");
 
-        List<Producto> productos = repo.findAll();
+        List<Producto> productos = repo.findByDisponibility(true);
         List<Categoria> categorias =  repoCat.findByDisponibility(true);
 
         model.addAttribute("productos", productos);

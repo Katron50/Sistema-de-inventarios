@@ -111,3 +111,11 @@ function borrarImg(button, event) {
         console.error('Error al eliminar la imagen:', error);
     });
 }
+
+
+//Compras
+
+function selectProduct(producto) {
+    console.log(producto);
+    document.getElementById('producto').textContent = producto.name;
+}

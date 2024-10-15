@@ -47,7 +47,7 @@ public class CategoriasController {
         model.addAttribute("editarModal", "Editar Categoria");
         
         //Lista de categorias
-        List<Categoria> categorias = repo.findAll();
+        List<Categoria> categorias = repo.findByDisponibility(true);
         model.addAttribute("categorias", categorias);
 
         // Contar productos por cada categoría y almacenarlo en el modelo

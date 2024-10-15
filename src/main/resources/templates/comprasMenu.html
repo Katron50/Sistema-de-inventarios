@@ -5,11 +5,142 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <link rel="stylesheet" th:href="@{css/style.css}">
+
     <title>Compras</title>
 </head>
 <body>
-    
+    <header class="hd">
+        <div th:replace="~{fragments/fragments.html :: header}"></div>
+    </header>
+
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/productos}">Productos</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/categorias}">Categorias</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/compras}">Compras</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/solicitud}">Solicitud</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="modal fade" id="agregarModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel" th:text="${agregarModal}"></h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    
+                     <!-- Formulario para agregar una compra -->
+                    <form th:action="@{/compras/add}" method="POST" th:object="${compraAdd}">
+                        <div class="mb-3">
+                            <label for="producto" class="form-label">Producto</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control"  id="producto" th:field="*{producto}" placeholder="Elige el producto de la compra" required>
+                                <button class="btn btn-secondary dropdown-toggle" type="button" id="btnMostrarProductos" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <ul class="dropdown-menu">
+                                        <li class="dropdown-item" th:each="producto : ${productos}" th:text="${producto.name}" th:onclick="selectProduct(${producto})"></li>
+                                    </ul>
+                                </button>
+                            </div>
+                            <p th:if="${#fields.hasErrors('producto')}" th:errors="*{producto}" th:errorclass="text-danger"></p>
+                            
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="cantidadComprada" class="form-label">Cantidad comprada</label>
+                            <input type="number" class="form-control"  id="cantidadComprada" th:field="*{cantidadComprada}" min="0.0" placeholder="Escribe la cantidad de productos que fue comprada" required>
+                            <p th:if="${#fields.hasErrors('cantidadComprada')}" th:errors="*{cantidadComprada}" th:errorclass="text-danger"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="cantidadActual" class="form-label">Cantidad Actual</label>
+                            <input type="number" class="form-control"  id="cantidadActual" th:field="*{cantidadActual}" min="0" placeholder="Escribe la cantidad restante de los productos" required>
+                            <p th:if="${#fields.hasErrors('cantidadActual')}" th:errors="*{cantidadActual}" th:errorclass="text-danger"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="CostoCompra" class="form-label">Costo total de compra</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control"  id="costoCompra" th:field="*{costoCompra}" min="0" placeholder="Escribe el precio total de la compra" required>
+                            </div>
+                            <p th:if="${#fields.hasErrors('costoCompra')}" th:errors="*{costoCompra}" th:errorclass="text-danger"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="comentario" class="form-label">Comentarios</label>
+                            <textarea class="form-control" name="comentario" id="comentario" th:field="*{comentario}" maxlength="250" placeholder="Escribe información de la compra"></textarea>
+                        </div>
+                        
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" onclick="agregar(this, event, 'productos')" class="btn btn-primary">Agregar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Botón del modal agregar -->
+        <button type="button" th:text="${agregarModal}" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#agregarModal"></button>
+
+        <!-- tabla de categorias -->
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Cantidad Comprada</th>
+                        <th scope="col">Cantidad Actual</th>
+                        <th scope="col">Precio restante</th>
+                        <th scope="col">Fecha en que se realizó la compra</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    <tr th:each="compra, compraStat : ${compras}">
+                        <div th:if="${compra.disponibility} == true">
+                            <th scope="row" th:text="${compraStat.count}"></th>
+                            <td th:text="${compra.producto.name}"></td>
+                            <td th:text="${compra.cantidadComprada}"></td>
+                            <td th:text="${compra.cantidadActual}"></td>
+                            <td th:text="${compra.costoCompra / costo.cantidadActual}"></td>
+                            <td th:text="${compra.date}"></td>
+
+                            <!-- Acciones -->
+                            <td> 
+                                <button type="button" onclick="editar(this, 'compras')" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editarModal" th:data-id="${compra.id}">
+                                    Editar
+                                </button>
+                                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#detalleModal" th:data-id="${compra.id}">
+                                    Ver comentarios de ediciones anteriores del producto
+                                </button>
+                            </td>
+                        </div>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script th:src="@{js/script.js}"></script>
 </body>
 </html>
