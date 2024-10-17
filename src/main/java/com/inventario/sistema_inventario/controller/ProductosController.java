@@ -125,7 +125,7 @@ public class ProductosController {
 
 
     @PostMapping("/edit")
-    public String editarCategoria(@RequestParam Long id, @Valid @ModelAttribute("producto") Producto producto, BindingResult result) {
+    public String editarProducto(@RequestParam Long id, @Valid @ModelAttribute("producto") Producto producto, BindingResult result) {
         if (result.hasErrors()) {
             return "redirect:/productos";  // Si hay errores de validación, redirige
         }

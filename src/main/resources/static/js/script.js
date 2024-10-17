@@ -31,30 +31,65 @@ function editar(button, entidad) {
     
     // Hacer una solicitud AJAX para obtener los datos de la entidad
     fetch(`/${entidad}/${id}`)
-    .then(response => response.json())  // Convertir la respuesta en JSON
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Error en la red: ${response.statusText}`);
+        }
+        return response.json(); // Convertir la respuesta en JSON
+    })
     .then(data => {
-
-        // Rellenar los campos del formulario con los datos obtenidos
-        document.getElementById('nameEdit').value = data.name;
-        document.getElementById('descriptionEdit').value = data.description;
-        
-        //Si es productos poner los datos que faltan
-        if (entidad === 'productos') {
-            document.getElementById('productKeyEdit').value = data.productKey;
-            document.getElementById('id_category_edit').value = data.categoria.id;
-            document.getElementById('toleranceEdit').value = data.tolerance;
-            if (data.image) {
-                document.getElementById('imageEditShow').src = `/images/${data.image}`;
-                document.getElementById('imageContainer').style.display = 'block';
-                document.getElementById('btnBorrarImg').setAttribute('data-id', id);
-            } else {
-                document.getElementById('imageContainer').style.display = 'none';
-            }
+        // Rellenar los campos del formulario dependiendo de la entidad
+        console.log(data);
+        switch (entidad) {
+            case 'productos':
+            case 'categorias':
+                rellenarProductoOCategoria(data, entidad);
+                break;
+            case 'compras':
+                rellenarCompra(data);
+                break;
+            default:
+                console.error(`Entidad no reconocida: ${entidad}`);
         }
     })
     .catch(error => {
         console.error(`Error al obtener los datos de la ${entidad}:`, error);
+        alert(`No se pudieron cargar los datos: ${error.message}`);
     });
+}
+//Funciones para rellenar los datos
+function rellenarProductoOCategoria(data, entidad) {
+    document.getElementById('nameEdit').value = data.name;
+    document.getElementById('descriptionEdit').value = data.description;
+
+    if (entidad === 'productos') {
+        document.getElementById('productKeyEdit').value = data.productKey;
+        document.getElementById('id_category_edit').value = data.categoria.id;
+        document.getElementById('toleranceEdit').value = data.tolerance;
+
+        if (data.image) {
+            document.getElementById('imageEditShow').src = `/images/${data.image}`;
+            document.getElementById('imageContainer').style.display = 'block';
+            document.getElementById('btnBorrarImg').setAttribute('data-id', data.id);
+        } else {
+            document.getElementById('imageContainer').style.display = 'none';
+        }
+    }
+}
+
+function rellenarCompra(data) {
+
+    document.getElementById('addProductoEdit').value = data.producto.name;
+    document.getElementById('addProductoIdEdit').value = data.producto.id;
+    document.getElementById('cantidadCompradaEdit').value = data.cantidadComprada;
+    document.getElementById('cantidadActualEdit').value = data.cantidadActual;
+    document.getElementById('costoCompraEdit').value = data.costoCompra;
+    document.getElementById('fechaCompraEdit').value = data.fechaCompra;
+
+    //botón de ver comentarios anteriores
+    const comentariosBtn = document.getElementById('comentariosCompra');
+    comentariosBtn.setAttribute('data-id', data.id);
+    comentariosBtn.onclick = () => cargarComentarios(data.id);
 }
 
 function borrar(button, entidad){
@@ -115,7 +150,41 @@ function borrarImg(button, event) {
 
 //Compras
 
-function selectProduct(producto) {
-    console.log(producto);
-    document.getElementById('producto').textContent = producto.name;
+function selectProduct(element, action) {
+    var productId = element.getAttribute("data-id");
+    var productName = element.textContent;
+    
+    if (action === 'agregar'){
+        // Actualizar el input de producto seleccionado
+        document.getElementById("addProducto").value = productName;
+        document.getElementById("addProductoId").value = productId;
+    }
+    if (action === 'editar') {
+        document.getElementById("addProductoEdit").value = productName;
+        document.getElementById("addProductoIdEdit").value = productId;
+    }
+
+}
+
+// Ver Comentarios
+function cargarComentarios(compraId) {
+    fetch('/compras/comentarios/' + compraId)
+        .then(response => response.json())
+        .then(data => {
+            let comentariosList = document.getElementById('comentarios-list');
+            comentariosList.innerHTML = '';  // Limpiar los comentarios previos
+            
+            if (data.length > 0) {
+                data.forEach(comentario => {
+                    let listItem = document.createElement('li');
+                    listItem.textContent = comentario.comentario + ' - ' + new Date(comentario.date).toLocaleString();
+                    comentariosList.appendChild(listItem);
+                });
+            } else {
+                comentariosList.innerHTML = '<li>No hay comentarios para esta compra.</li>';
+            }
+        })
+        .catch(error => {
+            console.error('Error al cargar los comentarios:', error);
+        });
 }

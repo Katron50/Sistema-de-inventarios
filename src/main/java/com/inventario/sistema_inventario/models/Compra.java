@@ -1,7 +1,14 @@
 package com.inventario.sistema_inventario.models;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,10 +16,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,6 +39,7 @@ public class Compra {
 
     @ManyToOne
     @JoinColumn(name = "id_producto", nullable = false)
+
     @NotNull(message = "No puede haber una compra sin producto")
     private Producto producto;
 
@@ -47,9 +55,13 @@ public class Compra {
     @PositiveOrZero(message = "El costo de compra debe ser un número positivo.")
     private double costoCompra;
 
-    @Size(max = 250, message = "La descripción no puede tener más de 250 caracteres.")
-    @Column(name = "cometario", nullable = true, length = 250)
-    private String comentario;
+    @OneToMany(mappedBy = "compra", cascade = CascadeType.ALL)  
+    @JsonIgnore
+    private List<Comentario> comentarios;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Column(name ="fechaCompra", nullable = false)
+    private LocalDate fechaCompra;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime date;

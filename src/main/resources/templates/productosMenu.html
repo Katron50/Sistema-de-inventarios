@@ -100,7 +100,7 @@
             </div>
             <div class="modal-body">
                 
-                <!--  Formulario para agregar categoria-->
+                <!--  Formulario para agregar productos-->
                 <form th:action="@{/productos/edit}" method="POST" th:object="${productoAdd}" id="editForm" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="key" class="form-label">Clave</label>
@@ -212,7 +212,7 @@
                             <td th:text="${producto.categoria.name}"></td>
 
                             <td>
-                                <img th:src="@{'/images/' + ${producto.image}}" width="100">
+                                <img th:src="@{'/images/' + ${producto.image}}" width="100" height="100">
                             </td>
 
                             <td>Precio</td>

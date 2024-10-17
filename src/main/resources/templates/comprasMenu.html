@@ -32,7 +32,7 @@
             </div>
         </div>
     </nav>
-
+    <!-- Modal Agregar -->
     <div class="modal fade" id="agregarModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -45,14 +45,18 @@
                      <!-- Formulario para agregar una compra -->
                     <form th:action="@{/compras/add}" method="POST" th:object="${compraAdd}">
                         <div class="mb-3">
-                            <label for="producto" class="form-label">Producto</label>
+                            <label for="addproducto" class="form-label">Producto</label>
                             <div class="input-group">
-                                <input type="text" class="form-control"  id="producto" th:field="*{producto}" placeholder="Elige el producto de la compra" required>
-                                <button class="btn btn-secondary dropdown-toggle" type="button" id="btnMostrarProductos" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <ul class="dropdown-menu">
-                                        <li class="dropdown-item" th:each="producto : ${productos}" th:text="${producto.name}" th:onclick="selectProduct(${producto})"></li>
-                                    </ul>
+                                <input type="text" class="form-control" list="productosList" id="addProducto" placeholder="Elige el producto de la compra" required>
+                                <input type="text" class="form-control" id="addProductoId" th:field="*{producto}" placeholder="id de la compra" hidden readonly>
+                                <datalist id="productosList">
+                                    <option th:each="producto : ${productos}" th:value="${producto.name}" th:data-id="${producto.id}" onclick="selectProduct(this, 'agregar')">
+                                </datalist>
+                                <button class="btn btn-secondary dropdown-toggle" type="button" id="btnMostrarProductos" data-bs-toggle="dropdown" aria-expanded="false">    
                                 </button>
+                                <ul class="dropdown-menu" >
+                                        <li th:each="producto : ${productos}"><a class="dropdown-item" th:text="${producto.name}" th:data-id="${producto.id}" onclick="selectProduct(this, 'agregar')" href="#"></a></li>
+                                </ul>
                             </div>
                             <p th:if="${#fields.hasErrors('producto')}" th:errors="*{producto}" th:errorclass="text-danger"></p>
                             
@@ -80,8 +84,14 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="fechaCompra" class="form-label">Fecha de compra</label>
+                            <input type="date" class="form-control"  id="fechaCompra" th:field="*{fechaCompra}" th:max="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required>
+                            <p th:if="${#fields.hasErrors('fechaCompra')}" th:errors="*{fechaCompra}" th:errorclass="text-danger"></p>
+                        </div>
+
+                        <div class="mb-3">
                             <label for="comentario" class="form-label">Comentarios</label>
-                            <textarea class="form-control" name="comentario" id="comentario" th:field="*{comentario}" maxlength="250" placeholder="Escribe información de la compra"></textarea>
+                            <textarea class="form-control" name="comentario" id="comentario" th:field="${comentarioAdd.comentario}" maxlength="250" placeholder="Escribe información de la compra"></textarea>
                         </div>
                         
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -91,6 +101,98 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Editar -->
+    <div class="modal fade" id="editarModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel" th:text="${editarModal}"></h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                     <!-- Formulario para editar una compra -->
+                    <form th:action="@{/compras/edit}" method="POST" th:object="${compraAdd}" id="editForm">
+                        <div class="mb-3">
+                            <label for="addproducto" class="form-label">Producto</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" list="productosList" id="addProductoEdit" placeholder="Elige el producto de la compra" required>
+                                <input type="text" class="form-control" id="addProductoIdEdit" th:field="*{producto}" placeholder="id de la compra" hidden readonly>
+                                <datalist id="productosList">
+                                    <option th:each="producto : ${productos}" th:value="${producto.name}" th:data-id="${producto.id}" onclick="selectProduct(this, 'editar')">
+                                </datalist>
+                                <button class="btn btn-secondary dropdown-toggle" type="button" id="btnMostrarProductos" data-bs-toggle="dropdown" aria-expanded="false">    
+                                </button>
+                                <ul class="dropdown-menu" >
+                                        <li th:each="producto : ${productos}"><a class="dropdown-item" th:text="${producto.name}" th:data-id="${producto.id}" onclick="selectProduct(this, 'editar')" href="#"></a></li>
+                                </ul>
+                            </div>
+                            <p th:if="${#fields.hasErrors('producto')}" th:errors="*{producto}" th:errorclass="text-danger"></p>
+                            
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="cantidadComprada" class="form-label">Cantidad comprada</label>
+                            <input type="number" class="form-control"  id="cantidadCompradaEdit" th:field="*{cantidadComprada}" min="0.0" placeholder="Escribe la cantidad de productos que fue comprada" required>
+                            <p th:if="${#fields.hasErrors('cantidadComprada')}" th:errors="*{cantidadComprada}" th:errorclass="text-danger"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="cantidadActual" class="form-label">Cantidad Actual</label>
+                            <input type="number" class="form-control"  id="cantidadActualEdit" th:field="*{cantidadActual}" min="0" placeholder="Escribe la cantidad restante de los productos" required>
+                            <p th:if="${#fields.hasErrors('cantidadActual')}" th:errors="*{cantidadActual}" th:errorclass="text-danger"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="CostoCompra" class="form-label">Costo total de compra</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control"  id="costoCompraEdit" th:field="*{costoCompra}" min="0" placeholder="Escribe el precio total de la compra" required>
+                            </div>
+                            <p th:if="${#fields.hasErrors('costoCompra')}" th:errors="*{costoCompra}" th:errorclass="text-danger"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fechaCompra" class="form-label">Fecha de compra</label>
+                            <input type="date" class="form-control"  id="fechaCompraEdit" th:field="*{fechaCompra}" th:max="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required>
+                            <p th:if="${#fields.hasErrors('fechaCompra')}" th:errors="*{fechaCompra}" th:errorclass="text-danger"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="comentario" class="form-label">Comentarios</label>
+                            <textarea class="form-control" name="comentario" id="comentario" th:field="${comentarioAdd.comentario}" maxlength="250" placeholder="Escribe porque se requiere actualizar la información" required></textarea>
+                        </div>
+
+                        <button type="button" class="btn btn-secondary" id="comentariosCompra" data-bs-toggle="modal" data-bs-target="#detalleModal">
+                            Ver comentarios anteriores
+                        </button>
+                        
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Actualizar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para ver los comentarios anteriores -->
+    <div class="modal fade" id="detalleModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Comentarios anteriores</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul id="comentarios-list">>
+                        
+                    </ul>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <div class="container">
         <!-- Botón del modal agregar -->
@@ -111,25 +213,21 @@
                     </tr>
                 </thead>
                 <tbody class="table-group-divider">
-                    <tr th:each="compra, compraStat : ${compras}">
-                        <div th:if="${compra.disponibility} == true">
-                            <th scope="row" th:text="${compraStat.count}"></th>
-                            <td th:text="${compra.producto.name}"></td>
-                            <td th:text="${compra.cantidadComprada}"></td>
-                            <td th:text="${compra.cantidadActual}"></td>
-                            <td th:text="${compra.costoCompra / costo.cantidadActual}"></td>
-                            <td th:text="${compra.date}"></td>
+                    <tr th:each="compra, compraStat : ${compras}" th:if="${compra.disponibility} == true">
 
-                            <!-- Acciones -->
-                            <td> 
-                                <button type="button" onclick="editar(this, 'compras')" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editarModal" th:data-id="${compra.id}">
-                                    Editar
-                                </button>
-                                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#detalleModal" th:data-id="${compra.id}">
-                                    Ver comentarios de ediciones anteriores del producto
-                                </button>
-                            </td>
-                        </div>
+                        <td scope="row" th:text="${compraStat.count}"></td>
+                        <td th:text="${compra.producto.name}"></td>
+                        <td th:text="${compra.cantidadComprada}"></td>
+                        <td th:text="${compra.cantidadActual}"></td>
+                        <td th:text="${(compra.cantidadActual * compra.costoCompra) / compra.cantidadComprada}"></td>
+                        <td th:text="${#temporals.format(compra.fechaCompra, 'dd/MM/yyyy')}"></td>
+                        
+                        <!-- Acciones -->
+                        <td> 
+                            <button type="button" onclick="editar(this, 'compras')" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editarModal" th:data-id="${compra.id}">
+                                Editar
+                            </button>
+                        </td>
                     </tr>
                 </tbody>
             </table>

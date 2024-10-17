@@ -12,5 +12,7 @@ public interface ProductoRepository extends JpaRepository<Producto, Long>{
 
     List<Producto> findByDisponibility(boolean disponibility);
 
+    Producto findByName(String name);
+
     int countByDisponibilityAndCategoriaId(boolean disponibility, Long categoriaId);
 } 
