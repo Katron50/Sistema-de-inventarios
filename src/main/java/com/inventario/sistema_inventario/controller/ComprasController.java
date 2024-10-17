@@ -111,9 +111,14 @@ public class ComprasController {
 
         // Guarda los cambios
         repo.save(compraExistente);
+
         if (!comentario.getComentario().isEmpty()){
-            comentario.setCompra(compra);
-            repoComent.save(comentario);
+
+            Comentario comentarioNew = new Comentario();
+
+            comentarioNew.setCompra(compra);
+            comentarioNew.setComentario(comentario.getComentario());
+            repoComent.save(comentarioNew);
         }
         
 

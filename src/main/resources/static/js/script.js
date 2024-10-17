@@ -16,6 +16,16 @@ function validaciones(event, entidad){
             event.preventDefault(); // Previene el envío del formulario
         }
     }
+    if (entidad == 'compras'){
+        let name = document.getElementById('addProducto').value;
+        let id = document.getElementById('addProductoId').value;
+        console.log(name, id);
+        if(name == null || id == null){
+            console.log(name, id);
+            event.preventDefault();
+        }
+        console.log(name, id);
+    }
     
 }
 
@@ -158,12 +168,40 @@ function selectProduct(element, action) {
         // Actualizar el input de producto seleccionado
         document.getElementById("addProducto").value = productName;
         document.getElementById("addProductoId").value = productId;
+        let name = document.getElementById("addProducto").value;
+        let id = document.getElementById("addProductoId").value;
+        
+        console.log(name, id)
     }
     if (action === 'editar') {
         document.getElementById("addProductoEdit").value = productName;
         document.getElementById("addProductoIdEdit").value = productId;
+        let name = document.getElementById("addProductoEdit").value;
+        let id = document.getElementById("addProductoIdEdit").value;
+        console.log(name, id)
     }
 
+}
+
+function handleInput(element, action) {
+    const value = element.value;
+    const options = document.querySelectorAll('#productosList option');
+    
+    options.forEach(option => {
+        if (option.value === value) {
+            let productId = option.getAttribute('data-id');
+            if (action === 'agregar'){
+                document.getElementById("addProductoId").value = productId;
+            } if (action === 'editar'){
+                document.getElementById("addProductoIdEdit").value = productId;
+                let id = document.getElementById("addProductoIdEdit").value;
+                console.log(id);
+
+            }
+            
+            console.log("Producto seleccionado desde datalist:", value, "ID:", productId);
+        }
+    });
 }
 
 // Ver Comentarios

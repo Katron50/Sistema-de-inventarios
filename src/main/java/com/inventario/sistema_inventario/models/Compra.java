@@ -39,7 +39,6 @@ public class Compra {
 
     @ManyToOne
     @JoinColumn(name = "id_producto", nullable = false)
-
     @NotNull(message = "No puede haber una compra sin producto")
     private Producto producto;
 

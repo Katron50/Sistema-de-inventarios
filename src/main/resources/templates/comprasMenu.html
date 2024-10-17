@@ -47,10 +47,10 @@
                         <div class="mb-3">
                             <label for="addproducto" class="form-label">Producto</label>
                             <div class="input-group">
-                                <input type="text" class="form-control" list="productosList" id="addProducto" placeholder="Elige el producto de la compra" required>
+                                <input type="text" class="form-control" list="productosList" id="addProducto" placeholder="Elige el producto de la compra" oninput="handleInput(this, 'agregar')" required>
                                 <input type="text" class="form-control" id="addProductoId" th:field="*{producto}" placeholder="id de la compra" hidden readonly>
                                 <datalist id="productosList">
-                                    <option th:each="producto : ${productos}" th:value="${producto.name}" th:data-id="${producto.id}" onclick="selectProduct(this, 'agregar')">
+                                    <option th:each="producto : ${productos}" th:value="${producto.name}" th:data-id="${producto.id}">
                                 </datalist>
                                 <button class="btn btn-secondary dropdown-toggle" type="button" id="btnMostrarProductos" data-bs-toggle="dropdown" aria-expanded="false">    
                                 </button>
@@ -95,7 +95,7 @@
                         </div>
                         
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        <button type="submit" onclick="agregar(this, event, 'productos')" class="btn btn-primary">Agregar</button>
+                        <button type="submit" onclick="agregar(this, event, 'compras')" class="btn btn-primary">Agregar</button>
                     </form>
                 </div>
             </div>
@@ -116,10 +116,10 @@
                         <div class="mb-3">
                             <label for="addproducto" class="form-label">Producto</label>
                             <div class="input-group">
-                                <input type="text" class="form-control" list="productosList" id="addProductoEdit" placeholder="Elige el producto de la compra" required>
+                                <input type="text" class="form-control" list="productosList" id="addProductoEdit" placeholder="Elige el producto de la compra" oninput="handleInput(this, 'editar')" required>
                                 <input type="text" class="form-control" id="addProductoIdEdit" th:field="*{producto}" placeholder="id de la compra" hidden readonly>
                                 <datalist id="productosList">
-                                    <option th:each="producto : ${productos}" th:value="${producto.name}" th:data-id="${producto.id}" onclick="selectProduct(this, 'editar')">
+                                    <option th:each="producto : ${productos}" th:value="${producto.name}" th:data-id="${producto.id}">
                                 </datalist>
                                 <button class="btn btn-secondary dropdown-toggle" type="button" id="btnMostrarProductos" data-bs-toggle="dropdown" aria-expanded="false">    
                                 </button>

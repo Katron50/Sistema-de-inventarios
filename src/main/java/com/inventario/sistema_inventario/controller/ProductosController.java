@@ -1,6 +1,8 @@
 package com.inventario.sistema_inventario.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,8 +26,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import com.inventario.sistema_inventario.models.Categoria;
+import com.inventario.sistema_inventario.models.Compra;
 import com.inventario.sistema_inventario.models.Producto;
 import com.inventario.sistema_inventario.services.CategoriaRepository;
+import com.inventario.sistema_inventario.services.CompraRepository;
 import com.inventario.sistema_inventario.services.ProductoRepository;
 
 import jakarta.validation.Valid;
@@ -38,6 +42,9 @@ public class ProductosController {
     
     @Autowired
     private ProductoRepository repo;
+
+    @Autowired
+    private CompraRepository repoCompra;
     
     @Autowired
     private CategoriaRepository repoCat;
@@ -53,6 +60,46 @@ public class ProductosController {
 
         model.addAttribute("productos", productos);
         model.addAttribute("categorias", categorias);
+
+        
+
+        Map<Long, Double> cantidadExistentePorProducto = new HashMap<>();
+        for (Producto producto : productos) {
+            List<Compra> compras = repoCompra.findByDisponibilityAndProducto(true, producto);
+            Double cantidadTotal;
+            if (!compras.isEmpty()) { // Verificamos que haya compras disponibles
+                cantidadTotal = repoCompra.sumCantidadByProducto(producto.getId());
+                cantidadExistentePorProducto.put(producto.getId(), cantidadTotal);
+                
+            }else{
+                cantidadTotal = 0.0;
+                cantidadExistentePorProducto.put(producto.getId(), cantidadTotal);
+            }
+
+
+        }
+
+        Map<Long, Double> precioRestantePorProducto = new HashMap<>();
+        for (Producto producto : productos) {
+            List<Compra> compras = repoCompra.findByDisponibilityAndProducto(true, producto);
+            double precioRestante;
+            if (!compras.isEmpty()) {
+                Compra ultimaCompra = compras.get(compras.size() - 1); // Supone que las compras están ordenadas
+                double cantidadRestante = ultimaCompra.getCantidadActual();
+                precioRestante = (ultimaCompra.getCostoCompra() / ultimaCompra.getCantidadComprada()) * cantidadRestante;
+        
+                precioRestantePorProducto.put(producto.getId(), precioRestante);
+            }else{
+
+                precioRestante = 0;
+
+                precioRestantePorProducto.put(producto.getId(), 0.0);
+            }
+
+        }
+
+        model.addAttribute("cantidadExistentePorProducto", cantidadExistentePorProducto);
+        model.addAttribute("precioRestantePorProducto", precioRestantePorProducto);
 
         model.addAttribute("productoAdd", new Producto());
 
