@@ -19,6 +19,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -43,7 +44,7 @@ public class Compra {
     private Producto producto;
 
     @Column(name = "cantidadComprada", nullable = false)
-    @PositiveOrZero(message = "La cantidad comprada debe ser un número positivo.")
+    @Positive(message = "La cantidad comprada debe ser un número positivo.")
     private double cantidadComprada;
 
     @Column(name = "cantidadActual", nullable = false)
@@ -75,51 +76,3 @@ public class Compra {
     }
 
 }
-
-
-// @Entity
-// @Table(name = "comentarios")
-// public class Comentario {
-    
-//     @Id
-//     @GeneratedValue(strategy = GenerationType.IDENTITY)
-//     private Long id;
-
-//     @ManyToOne
-//     @JoinColumn(name = "compra_id", nullable = false)
-//     private Compra compra;
-
-//     @Size(max = 250, message = "La descripción no puede tener más de 250 caracteres.")
-//     @Column(name = "comentario", nullable = false, length = 250)
-//     private String comentario;
-
-//     private LocalDateTime fecha; // Para registrar cuándo se hizo el comentario
-
-//     // Constructor, getters y setters
-// }
-
-
-// @OneToMany(mappedBy = "compra", cascade = CascadeType.ALL, orphanRemoval = true)
-// private List<Comentario> comentarios = new ArrayList<>();
-
-// // Métodos para agregar un comentario
-// public void agregarComentario(String texto) {
-//     Comentario comentario = new Comentario();
-//     comentario.setComentario(texto);
-//     comentario.setCompra(this);
-//     comentarios.add(comentario);
-// }
-
-
-// @Column(name = "comentarios", nullable = true)
-// private String comentariosJson; // Almacena los comentarios en formato JSON
-
-// public List<String> getComentarios() {
-//     // Lógica para deserializar JSON a List<String>
-// }
-
-// public void agregarComentario(String comentario) {
-//     List<String> comentarios = getComentarios();
-//     comentarios.add(comentario);
-//     this.comentariosJson = serializeToJson(comentarios); // Serializa de vuelta a JSON
-// }

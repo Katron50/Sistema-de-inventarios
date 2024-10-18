@@ -25,7 +25,7 @@
                     <li class="nav-item"><a class="nav-link" th:href="@{/productos}">Productos</a></li>
                     <li class="nav-item"><a class="nav-link" th:href="@{/categorias}">Categorias</a></li>
                     <li class="nav-item"><a class="nav-link" th:href="@{/compras}">Compras</a></li>
-                    <li class="nav-item"><a class="nav-link" th:href="@{/solicitud}">Solicitud</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/solicitudes}">Solicitud</a></li>
                 </ul>
             </div>
         </div>
@@ -41,24 +41,23 @@
                 </div>
                 <div class="modal-body">
                     
-                    <!--  Formulario para agregar categoria-->
+                    <!--  Formulario para agregar producto-->
                     <form th:action="@{/productos/add}" method="POST" th:object="${productoAdd}" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="key" class="form-label">Clave</label>
                             <input type="text" class="form-control"  id="key" th:field="*{productKey}" placeholder="Máximo 15 caracteres" maxlength="15" required>
-                                <p th:if="${#fields.hasErrors('productKey')}" th:errors="*{productKey}" th:errorclass="text-danger"></p>
+                            <p style="display: none;" id="errorKey" class="invalid-feedback"></p>
                         </div>
 
                         <div class="mb-3">
                             <label for="name" class="form-label">Nombre</label>
                             <input type="text" class="form-control"  id="name" th:field="*{name}" placeholder="Escribe el nombre del producto" maxlength="50" required>
-                            <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" th:errorclass="text-danger"></p>
+                            <p style="display: none;" id="errorName" class="invalid-feedback"></p>
                         </div>
 
                         <div class="mb-3">
                             <label for="description" class="form-label">Descripción</label>
                             <textarea class="form-control"  id="description" th:field="*{description}" maxlength="250"></textarea>
-                            <p th:if="${#fields.hasErrors('description')}" th:errors="*{description}" th:errorclass="text-danger"></p>
                         </div>
 
                         <div class="mb-3">
@@ -79,11 +78,11 @@
                         <div class="mb-3">
                             <label for="tolerance" class="form-label">Tolerancia</label>
                             <input type="number" class="form-control" name="tolerance" id="tolerance" min="0" placeholder="Sirve para avisar si se esta por acabar las existencias" th:field="*{tolerance}">
-                            <p th:if="${#fields.hasErrors('tolerance')}" th:errors="*{tolerance}" th:errorclass="text-danger"></p>
+                            <p style="display: none;" id="errorTolerance" class="invalid-feedback"></p>
                         </div>
                         
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        <button type="submit" onclick="agregar(this, event, 'productos')" class="btn btn-primary">Agregar</button>
+                        <button type="submit" onclick="agregarModal(event, 'productos')" class="btn btn-primary">Agregar</button>
                     </form>
                 </div>
             </div>
@@ -100,18 +99,17 @@
             </div>
             <div class="modal-body">
                 
-                <!--  Formulario para agregar productos-->
+                <!--  Formulario para editar productos-->
                 <form th:action="@{/productos/edit}" method="POST" th:object="${productoAdd}" id="editForm" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="key" class="form-label">Clave</label>
                         <input type="text" id="productKeyEdit" class="form-control" placeholder="Máximo 15 caracteres" maxlength="15" disabled required>
-                            <p th:if="${#fields.hasErrors('productKey')}" th:errors="*{productKey}" th:errorclass="text-danger"></p>
                     </div>
 
                     <div class="mb-3">
                         <label for="name" class="form-label">Nombre</label>
                         <input type="text" class="form-control"  id="nameEdit" th:field="*{name}" placeholder="Escribe el nombre del producto" maxlength="50" required>
-                        <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" th:errorclass="text-danger"></p>
+                        <p style="display: none;" id="errorNameEdit" class="invalid-feedback"></p>
                     </div>
 
                     <div class="mb-3">
@@ -126,7 +124,7 @@
                             <option value="" disabled selected>Seleccione una categoría</option>
                             <option th:each="categoria : ${categorias}" th:text="${categoria.name}" th:value="${categoria.id}" ></option>
                         </select>
-                        <!-- <p th:if="${#fields.hasErrors('id_category')}" th:errors="*{id_category}" th:errorclass="text-danger"></p> -->
+                        
                     </div>
 
                     <div class="mb-3">
@@ -149,12 +147,12 @@
                     <div class="mb-3">
                         <label for="tolerance" class="form-label">Tolerancia</label>
                         <input type="number" class="form-control" name="tolerance" id="toleranceEdit" min="0" placeholder="Sirve para avisar si se esta por acabar las existencias" th:field="*{tolerance}">
-                        <p th:if="${#fields.hasErrors('tolerance')}" th:errors="*{tolerance}" th:errorclass="text-danger"></p>
+                        <p style="display: none;" id="errorToleranceEdit" class="invalid-feedback"></p>
                         
                     </div>
                     
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-primary">Actualizar</button>
+                    <button type="submit" class="btn btn-primary" onclick="editarModal(event, 'productos')">Actualizar</button>
                   </form>
             </div>
         </div>

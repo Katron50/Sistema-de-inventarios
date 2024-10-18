@@ -1,30 +1,119 @@
 
-function agregar(button, event, entidad){
-
-    validaciones(event, entidad);
+function agregarModal(event, entidad){
+    validaciones(event, entidad, 'agregar');
+}
+function editarModal(event, entidad){
+    validaciones(event, entidad, 'editar');
 }
 
-function validaciones(event, entidad){
+
+
+function validaciones(event, entidad, action){
+    if (entidad == 'categorias'){
+        if(action === 'agregar'){
+            let nameInput = document.getElementById('name');
+            if (nameInput.value.trim() === ''){
+                document.getElementById('errorName').textContent = "No puede estar vacio el nombre";
+                document.getElementById('errorName').style.display = "block";
+                event.preventDefault();
+            }
+        } if(action === 'editar'){
+            let nameInput = document.getElementById('nameEdit');
+            if (nameInput.value.trim() === ''){
+                document.getElementById('errorNameEdit').textContent = "No puede estar vacio el nombre";
+                document.getElementById('errorNameEdit').style.display = "block";
+                event.preventDefault();
+            }
+        }
+    }
 
     if (entidad == 'productos'){
-        let toleranceInput = document.getElementById('tolerance');
-        if (toleranceInput.value.trim() === '') {
-            toleranceInput.value = 0; // Establece 0 si el campo está vacío
-        }else if (isNaN(toleranceInput.value)) {
-            // Maneja el caso en que el valor no es un número
-            alert('Por favor, ingresa un número válido para la tolerancia.');
+        if (action === 'agregar'){
+            if (document.getElementById('key').value.length < 14){
+                document.getElementById('errorKey').textContent = "Deben ser 15 caracteres sin espacios";
+                document.getElementById('errorKey').style.display = "block";
+                event.preventDefault();
+            }
+            if (document.getElementById('name').value.trim() === ''){
+                document.getElementById('errorName').textContent = "No puede estar vacio el nombre";
+                document.getElementById('errorName').style.display = "block";
+                event.preventDefault();
+            }
+            let toleranceInput = document.getElementById('tolerance');
+            if (toleranceInput.value.trim() === '') {
+                toleranceInput.value = 0; // Establece 0 si el campo está vacío
+            }else if (isNaN(toleranceInput.value)) {
+                document.getElementById('errorTolerance').textContent = "Ingresa un número";
+                document.getElementById('errorTolerance').style.display = "block";
             event.preventDefault(); // Previene el envío del formulario
+            }
+        }
+        if (action === 'editar'){
+            if (document.getElementById('nameEdit').value.trim() === ''){
+                document.getElementById('errorNameEdit').textContent = "No puede estar vacio el nombre";
+                document.getElementById('errorNameEdit').style.display = "block";
+                event.preventDefault();
+            }
+            let toleranceInput = document.getElementById('toleranceEdit');
+            if (toleranceInput.value.trim() === '') {
+                toleranceInput.value = 0; // Establece 0 si el campo está vacío
+            }else if (isNaN(toleranceInput.value)) {
+                document.getElementById('errorToleranceEdit').textContent = "Ingresa un número";
+                document.getElementById('errorToleranceEdit').style.display = "block";
+                event.preventDefault(); // Previene el envío del formulario
+            }
         }
     }
     if (entidad == 'compras'){
-        let name = document.getElementById('addProducto').value;
-        let id = document.getElementById('addProductoId').value;
-        console.log(name, id);
-        if(name == null || id == null){
-            console.log(name, id);
-            event.preventDefault();
+        if (action === 'agregar'){
+            let name = document.getElementById('addProducto').value;
+            let id = document.getElementById('addProductoId').value;
+            if(name == null || id == null){
+                document.getElementById('errorProduct').textContent = "Ingresa un producto";
+                document.getElementById('errorProduct').style.display = "block";
+                event.preventDefault();
+            }
+            if(document.getElementById('cantidadComprada').value < 1){
+                document.getElementById('errorCantidadComprada').textContent = "La cantidad debe ser minimo 1";
+                document.getElementById('errorCantidadComprada').style.display = "block";
+                event.preventDefault();
+            }if(document.getElementById('cantidadActual').value < 1){
+                document.getElementById('errorCantidadActual').textContent = "La cantidad debe ser minimo 1";
+                document.getElementById('errorCantidadActual').style.display = "block";
+                event.preventDefault();
+            }if (document.getElementById('cantidadActual').value > document.getElementById('cantidadComprada').value){
+                document.getElementById('errorCantidadActual').textContent = "La cantidad actual no puede ser mayor a la cantidad comprada";
+                document.getElementById('errorCantidadActual').style.display = "block";
+                event.preventDefault();
+            }
         }
-        console.log(name, id);
+        if (action === 'editar'){
+            let name = document.getElementById('addProductoEdit').value;
+            let id = document.getElementById('addProductoIdEdit').value;
+            if(name == null || id == null){
+                document.getElementById('errorProductEdit').textContent = "Ingresa un producto";
+                document.getElementById('errorProductEdit').style.display = "block";
+                event.preventDefault();
+            }
+            if(document.getElementById('cantidadCompradaEdit').value < 1){
+                document.getElementById('errorCantidadCompradaEdit').textContent = "La cantidad debe ser minimo 1";
+                document.getElementById('errorCantidadCompradaEdit').style.display = "block";
+                event.preventDefault();
+            }if(document.getElementById('cantidadActualEdit').value < 1){
+                document.getElementById('errorCantidadActualEdit').textContent = "La cantidad debe ser minimo 1";
+                document.getElementById('errorCantidadActualEdit').style.display = "block";
+                event.preventDefault();
+            }if (document.getElementById('cantidadActualEdit').value > document.getElementById('cantidadCompradaEdit').value){
+                document.getElementById('errorCantidadActualEdit').textContent = "La cantidad actual no puede ser mayor a la cantidad comprada";
+                document.getElementById('errorCantidadActualEdit').style.display = "block";
+                event.preventDefault();
+            }if (document.getElementById('comentarioEdit').value == null || document.getElementById('comentarioEdit').value === ''){
+                document.getElementById('errorComentarioEdit').textContent = "Debes escribir un comentario sobre la edición";
+                document.getElementById('errorComentarioEdit').style.display = "block";
+                event.preventDefault();
+            }
+        }
+        
     }
     
 }
@@ -112,7 +201,7 @@ function borrar(button, entidad){
     .then(response => response.json())  // Convertir la respuesta en JSON
     .then(data => {
         // Rellenar los campos del formulario con los datos obtenidos
-        if(entidad == 'categoria'){
+        if(entidad === 'categorias'){
             document.getElementById('nameDelete').textContent = `¿Seguro que quieres eliminar la categoria ${data.name}?`;
 
         }else if (entidad == 'productos') {
@@ -180,26 +269,58 @@ function selectProduct(element, action) {
         let id = document.getElementById("addProductoIdEdit").value;
         console.log(name, id)
     }
+    if (action === 'agregarProducto') {
+        const imgElement = element.closest('.row').querySelector('.mostrarImg');
+        fetch(`/productos/${productId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.image != null){
+                imgElement.style.display = 'block';
+                imgElement.src = '/images/' + data.image;
+            } else{
+                imgElement.style.display = 'none';
+            }
+        });
+    }
 
 }
 
 function handleInput(element, action) {
     const value = element.value;
     const options = document.querySelectorAll('#productosList option');
-    
     options.forEach(option => {
         if (option.value === value) {
             let productId = option.getAttribute('data-id');
-            if (action === 'agregar'){
-                document.getElementById("addProductoId").value = productId;
-            } if (action === 'editar'){
-                document.getElementById("addProductoIdEdit").value = productId;
-                let id = document.getElementById("addProductoIdEdit").value;
-                console.log(id);
+            fetch(`/productos/${productId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (action === 'agregar'){
+                                document.getElementById("addProductoId").value = productId;
+                            } if (action === 'editar'){
+                                document.getElementById("addProductoIdEdit").value = productId;
 
-            }
+                            } if(action === 'agregarProducto'){
+                                const imgElement = element.closest('.row').querySelector('.mostrarImg');
+                                
+                                    if (data.image != null){
+                                        imgElement.style.display = 'block';
+                                        imgElement.src = '/images/' + data.image;
+                                    } else{
+                                        imgElement.style.display = 'none';
+                                    }
+                                
+
+                                const productoId = element.closest('.row').querySelector('.addProductoId');
+                                productoId.value = data.id;
+                                const productName = element.closest('.row').querySelector('.addProducto');
+                                productName.value = data.name;
+                
+                
+                            }
+                            console.log("Producto seleccionado desde datalist:", value, "ID:", productId);
+            });
             
-            console.log("Producto seleccionado desde datalist:", value, "ID:", productId);
+            
         }
     });
 }
@@ -225,4 +346,74 @@ function cargarComentarios(compraId) {
         .catch(error => {
             console.error('Error al cargar los comentarios:', error);
         });
+}
+
+//Cambiar vista
+
+function cambiarVista(){
+    let vistaAdmin = document.getElementById('vistaAdmin');
+    let vistaUser = document.getElementById('vistaUser');
+
+    if (vistaAdmin.style.display === 'none'){
+        vistaAdmin.style.display = 'block';
+        vistaUser.style.display = 'none';
+        
+    }else{
+        vistaAdmin.style.display = 'none';
+        vistaUser.style.display = 'block';
+
+    }
+
+
+}
+
+//Añadir más productos a la solicitud
+function addRow() {
+    // Crear un nuevo contenedor para la nueva fila
+    const newRow = document.createElement('div');
+    newRow.className = 'row';
+    
+    // Agregar los campos de entrada
+    newRow.innerHTML = `
+        <div class="col-2">
+            <label for="img" class="form-label">Imagen</label>
+            <img class="mostrarImg" name="img" style="display: none;" width="100" height="100">
+        </div>
+        
+        <div class="col-6">
+            <label for="addproducto" class="form-label">Producto</label>
+            <div class="input-group">
+                <input type="text" class="form-control addProducto" list="productosList" placeholder="Elige el producto de la compra" oninput="handleInput(this, 'agregarProducto')" required>
+                <input type="text" class="form-control addProductoId" placeholder="id de la compra" hidden readonly>
+                <datalist id="productosList">
+                    <option th:each="producto : &#36;{productos}" th:value="&#36;{producto.name}" th:data-id="&#36;{producto.id}"></option>
+                </datalist>
+            </div>
+            <p th:if="&#36;{#fields.hasErrors('producto')}" th:errors="*{producto}" th:errorclass="text-danger"></p>
+        </div>
+
+        <div class="col-2">
+            <label for="cantidad" class="form-label">Cantidad</label>
+            <input type="number" class="form-control" id="cantidad" min="1" required>
+        </div>
+        
+        <div class="col-2">
+            <p class="form-label">Borrar</p>
+            <button type="button" class="btn btn-danger" onclick="removeRow(this)"><i class="bi bi-trash"></i></button>
+        </div>
+    `;
+
+    // Agregar la nueva fila al contenedor
+    document.getElementById('solicitudesContainer').appendChild(newRow);
+}
+
+//Eliminar producto de la solicitud
+function removeRow(button) {
+    // Eliminar la fila que contiene el botón
+    const row = button.parentNode.parentNode; // Obtiene el contenedor de la fila
+    row.parentNode.removeChild(row); // Elimina la fila del DOM
+}
+
+function limpiarCampos(){
+
 }

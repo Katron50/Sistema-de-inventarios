@@ -25,7 +25,8 @@
                     <li class="nav-item"><a class="nav-link" th:href="@{/productos}">Productos</a></li>
                     <li class="nav-item"><a class="nav-link" th:href="@{/categorias}">Categorias</a></li>
                     <li class="nav-item"><a class="nav-link" th:href="@{/compras}">Compras</a></li>
-                    <li class="nav-item"><a class="nav-link" th:href="@{/solicitud}">Solicitud</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/solicitudes}">Solicitud</a></li>
+                    
                 </ul>
             </div>
         </div>
@@ -46,11 +47,8 @@
                     <div class="mb-3">
                         <label for="name" class="form-label">Nombre</label>
                         <input type="text" class="form-control"  id="name" th:field="*{name}" placeholder="Escribe el nombre de la categoria" maxlength="50" required>
+                        <p style="display: none;" id="errorName" class="invalid-feedback"></p>
                     </div>
-
-                    <!-- <div th:if="${#fields.hasErrors('name')}" style="color: red;">
-                        <p th:each="err : ${#fields.errors('name')}" th:text="${err}"></p>
-                    </div> -->
                     
                     <div class="mb-3">
                         <label for="description" class="form-label">Descripción</label>
@@ -58,8 +56,8 @@
                     </div>
                     
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-primary">Agregar</button>
-                  </form>
+                    <button type="submit" class="btn btn-primary" onclick="agregarModal(event, 'categorias')">Agregar</button>
+                </form>
             </div>
         </div>
         </div>
@@ -79,13 +77,14 @@
                         <div class="mb-3">
                             <label for="nameEdit" class="form-label">Nombre</label>
                             <input type="text" class="form-control" th:field="*{name}" id="nameEdit" name="nameEdit" placeholder="Escribe el nombre de la categoría" maxlength="50">
+                            <p style="display: none;" id="errorNameEdit" class="invalid-feedback"></p>
                         </div>
                         <div class="mb-3">
                             <label for="descriptionEdit" class="form-label">Descripción</label>
                             <textarea class="form-control" th:field="*{description}" id="descriptionEdit" name="descriptionEdit" rows="3" maxlength="250"></textarea>
                         </div>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        <button type="submit" class="btn btn-primary">Actualizar</button>
+                        <button type="submit" class="btn btn-primary" onclick="editarModal(event, 'categorias')" >Actualizar</button>
                     </form>
                 </div>
             </div>
@@ -100,7 +99,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- th:object="${categoriaAdd}" *{name} th:text=""-->
                     <form id="deleteForm" method="POST" th:object="${categoriaAdd}" action="/categorias/delete">
 
                         <div class="mb-3">

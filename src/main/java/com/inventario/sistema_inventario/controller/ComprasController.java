@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.inventario.sistema_inventario.models.Categoria;
 import com.inventario.sistema_inventario.models.Comentario;
 import com.inventario.sistema_inventario.models.Compra;
 import com.inventario.sistema_inventario.models.Producto;

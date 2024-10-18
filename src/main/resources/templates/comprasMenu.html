@@ -27,7 +27,8 @@
                     <li class="nav-item"><a class="nav-link" th:href="@{/productos}">Productos</a></li>
                     <li class="nav-item"><a class="nav-link" th:href="@{/categorias}">Categorias</a></li>
                     <li class="nav-item"><a class="nav-link" th:href="@{/compras}">Compras</a></li>
-                    <li class="nav-item"><a class="nav-link" th:href="@{/solicitud}">Solicitud</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/solicitudes}">Solicitud</a></li>
+                    
                 </ul>
             </div>
         </div>
@@ -58,50 +59,53 @@
                                         <li th:each="producto : ${productos}"><a class="dropdown-item" th:text="${producto.name}" th:data-id="${producto.id}" onclick="selectProduct(this, 'agregar')" href="#"></a></li>
                                 </ul>
                             </div>
-                            <p th:if="${#fields.hasErrors('producto')}" th:errors="*{producto}" th:errorclass="text-danger"></p>
+                            <p style="display: none;" id="errorProduct" class="invalid-feedback"></p>
                             
                         </div>
-
+                        
                         <div class="mb-3">
                             <label for="cantidadComprada" class="form-label">Cantidad comprada</label>
                             <input type="number" class="form-control"  id="cantidadComprada" th:field="*{cantidadComprada}" min="0.0" placeholder="Escribe la cantidad de productos que fue comprada" required>
-                            <p th:if="${#fields.hasErrors('cantidadComprada')}" th:errors="*{cantidadComprada}" th:errorclass="text-danger"></p>
+                            <p style="display: none;" id="errorCantidadComprada" class="invalid-feedback"></p>
+                            
                         </div>
-
+                        
                         <div class="mb-3">
                             <label for="cantidadActual" class="form-label">Cantidad Actual</label>
                             <input type="number" class="form-control"  id="cantidadActual" th:field="*{cantidadActual}" min="0" placeholder="Escribe la cantidad restante de los productos" required>
-                            <p th:if="${#fields.hasErrors('cantidadActual')}" th:errors="*{cantidadActual}" th:errorclass="text-danger"></p>
+                            <p style="display: none;" id="errorCantidadActual" class="invalid-feedback"></p>
+                            
                         </div>
-
+                        
                         <div class="mb-3">
                             <label for="CostoCompra" class="form-label">Costo total de compra</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
                                 <input type="number" class="form-control"  id="costoCompra" th:field="*{costoCompra}" min="0" placeholder="Escribe el precio total de la compra" required>
                             </div>
-                            <p th:if="${#fields.hasErrors('costoCompra')}" th:errors="*{costoCompra}" th:errorclass="text-danger"></p>
+                            <p style="display: none;" id="errorCostoCompra" class="invalid-feedback"></p>
+                            
                         </div>
-
+                        
                         <div class="mb-3">
                             <label for="fechaCompra" class="form-label">Fecha de compra</label>
                             <input type="date" class="form-control"  id="fechaCompra" th:field="*{fechaCompra}" th:max="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required>
                             <p th:if="${#fields.hasErrors('fechaCompra')}" th:errors="*{fechaCompra}" th:errorclass="text-danger"></p>
                         </div>
-
+                        
                         <div class="mb-3">
                             <label for="comentario" class="form-label">Comentarios</label>
                             <textarea class="form-control" name="comentario" id="comentario" th:field="${comentarioAdd.comentario}" maxlength="250" placeholder="Escribe información de la compra"></textarea>
                         </div>
                         
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        <button type="submit" onclick="agregar(this, event, 'compras')" class="btn btn-primary">Agregar</button>
+                        <button type="submit" onclick="agregarModal(event, 'compras')" class="btn btn-primary">Agregar</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
+    
     <!-- Modal Editar -->
     <div class="modal fade" id="editarModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -111,7 +115,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                     <!-- Formulario para editar una compra -->
+                    <!-- Formulario para editar una compra -->
                     <form th:action="@{/compras/edit}" method="POST" th:object="${compraAdd}" id="editForm">
                         <div class="mb-3">
                             <label for="addproducto" class="form-label">Producto</label>
@@ -119,30 +123,30 @@
                                 <input type="text" class="form-control" list="productosList" id="addProductoEdit" placeholder="Elige el producto de la compra" oninput="handleInput(this, 'editar')" required>
                                 <input type="text" class="form-control" id="addProductoIdEdit" th:field="*{producto}" placeholder="id de la compra" hidden readonly>
                                 <datalist id="productosList">
-                                    <option th:each="producto : ${productos}" th:value="${producto.name}" th:data-id="${producto.id}">
+                                <option th:each="producto : ${productos}" th:value="${producto.name}" th:data-id="${producto.id}">
                                 </datalist>
                                 <button class="btn btn-secondary dropdown-toggle" type="button" id="btnMostrarProductos" data-bs-toggle="dropdown" aria-expanded="false">    
                                 </button>
                                 <ul class="dropdown-menu" >
-                                        <li th:each="producto : ${productos}"><a class="dropdown-item" th:text="${producto.name}" th:data-id="${producto.id}" onclick="selectProduct(this, 'editar')" href="#"></a></li>
+                                    <li th:each="producto : ${productos}"><a class="dropdown-item" th:text="${producto.name}" th:data-id="${producto.id}" onclick="selectProduct(this, 'editar')" href="#"></a></li>
                                 </ul>
                             </div>
-                            <p th:if="${#fields.hasErrors('producto')}" th:errors="*{producto}" th:errorclass="text-danger"></p>
+                                
+                                <p style="display: none;" id="errorProductEdit" class="invalid-feedback"></p>
+                            </div>
                             
-                        </div>
-
                         <div class="mb-3">
                             <label for="cantidadComprada" class="form-label">Cantidad comprada</label>
                             <input type="number" class="form-control"  id="cantidadCompradaEdit" th:field="*{cantidadComprada}" min="0.0" placeholder="Escribe la cantidad de productos que fue comprada" required>
-                            <p th:if="${#fields.hasErrors('cantidadComprada')}" th:errors="*{cantidadComprada}" th:errorclass="text-danger"></p>
+                            <p style="display: none;" id="errorCantidadCompradaEdit" class="invalid-feedback"></p>
                         </div>
-
+                        
                         <div class="mb-3">
                             <label for="cantidadActual" class="form-label">Cantidad Actual</label>
                             <input type="number" class="form-control"  id="cantidadActualEdit" th:field="*{cantidadActual}" min="0" placeholder="Escribe la cantidad restante de los productos" required>
-                            <p th:if="${#fields.hasErrors('cantidadActual')}" th:errors="*{cantidadActual}" th:errorclass="text-danger"></p>
+                            <p style="display: none;" id="errorCantidadActualEdit" class="invalid-feedback"></p>
                         </div>
-
+                        
                         <div class="mb-3">
                             <label for="CostoCompra" class="form-label">Costo total de compra</label>
                             <div class="input-group">
@@ -151,16 +155,17 @@
                             </div>
                             <p th:if="${#fields.hasErrors('costoCompra')}" th:errors="*{costoCompra}" th:errorclass="text-danger"></p>
                         </div>
-
+                        
                         <div class="mb-3">
                             <label for="fechaCompra" class="form-label">Fecha de compra</label>
                             <input type="date" class="form-control"  id="fechaCompraEdit" th:field="*{fechaCompra}" th:max="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required>
                             <p th:if="${#fields.hasErrors('fechaCompra')}" th:errors="*{fechaCompra}" th:errorclass="text-danger"></p>
                         </div>
-
+                        
                         <div class="mb-3">
-                            <label for="comentario" class="form-label">Comentarios</label>
-                            <textarea class="form-control" name="comentario" id="comentario" th:field="${comentarioAdd.comentario}" maxlength="250" placeholder="Escribe porque se requiere actualizar la información" required></textarea>
+                            <label for="comentarioEdit" class="form-label">Comentarios</label>
+                            <textarea class="form-control" name="comentarioEdit" id="comentarioEdit" th:field="${comentarioAdd.comentario}" maxlength="250" placeholder="Escribe porque se requiere actualizar la información" required></textarea>
+                            <p style="display: none;" id="errorComentarioEdit" class="invalid-feedback"></p>
                         </div>
 
                         <button type="button" class="btn btn-secondary" id="comentariosCompra" data-bs-toggle="modal" data-bs-target="#detalleModal">
@@ -168,7 +173,7 @@
                         </button>
                         
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        <button type="submit" class="btn btn-primary">Actualizar</button>
+                        <button type="submit" class="btn btn-primary" onclick="editarModal(event, 'compras')">Actualizar</button>
                     </form>
                 </div>
             </div>
@@ -236,7 +241,7 @@
 
 
 
-
+<!-- Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
     <script th:src="@{js/script.js}"></script>
